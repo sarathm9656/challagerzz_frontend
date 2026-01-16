@@ -128,9 +128,9 @@ const DeductionPlanning = ({ isAdmin }) => {
 
         // 1. Header Section - Logo on Left
         const img = new Image();
-        img.src = '/logo.jpg';
+        img.src = '/chanllangers.png';
         try {
-            doc.addImage(img, 'JPEG', 14, 10, 22, 22);
+            doc.addImage(img, 'PNG', 14, 10, 22, 22);
         } catch (e) {
             doc.setFillColor(79, 70, 229);
             doc.rect(14, 10, 22, 22, 'F');

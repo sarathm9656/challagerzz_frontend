@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import { toast } from 'react-hot-toast';
-import { FaUserPlus, FaCalendarPlus, FaExchangeAlt, FaHistory, FaToggleOn, FaToggleOff, FaTags, FaTrash } from 'react-icons/fa';
+import { FaUserPlus, FaCalendarPlus, FaExchangeAlt, FaHistory, FaToggleOn, FaToggleOff, FaTags, FaTrash, FaFilePdf, FaEdit } from 'react-icons/fa';
 
 const SuperAdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('admins'); // admins, events, categories, logs
@@ -13,6 +15,7 @@ const SuperAdminDashboard = () => {
 
     // Modal States
     const [showAdminModal, setShowAdminModal] = useState(false);
+    const [showEditAdminModal, setShowEditAdminModal] = useState(false);
     const [showEventModal, setShowEventModal] = useState(false);
     const [showCategoryModal, setShowCategoryModal] = useState(false);
     const [showManageEventsModal, setShowManageEventsModal] = useState(false);
@@ -21,6 +24,7 @@ const SuperAdminDashboard = () => {
 
     // Forms
     const [adminForm, setAdminForm] = useState({ username: '', password: '', email: '', assignedEvents: [] });
+    const [editAdminForm, setEditAdminForm] = useState({ id: '', username: '', password: '', email: '' });
     const [eventForm, setEventForm] = useState({ name: '' });
     const [categoryForm, setCategoryForm] = useState({ name: '', eventId: '' });
 
@@ -73,6 +77,35 @@ const SuperAdminDashboard = () => {
             toast.success("Admin created successfully");
         } catch (err) {
             toast.error("Error creating admin: " + (err.response?.data?.message || err.message));
+        }
+    };
+
+    const handleOpenEditAdmin = (admin) => {
+        setEditAdminForm({
+            id: admin._id,
+            username: admin.username,
+            email: admin.email || '',
+            password: '' // Don't show existing hash, separate update
+        });
+        setShowEditAdminModal(true);
+    };
+
+    const handleUpdateAdmin = async (e) => {
+        e.preventDefault();
+        try {
+            const payload = {
+                username: editAdminForm.username,
+                email: editAdminForm.email
+            };
+            if (editAdminForm.password) {
+                payload.password = editAdminForm.password;
+            }
+            await axios.put(`/api/superadmin/admins/${editAdminForm.id}`, payload, config);
+            setShowEditAdminModal(false);
+            fetchData();
+            toast.success("Admin updated successfully");
+        } catch (err) {
+            toast.error("Error updating admin: " + (err.response?.data?.message || err.message));
         }
     };
 
@@ -178,6 +211,73 @@ const SuperAdminDashboard = () => {
         }
     };
 
+    const handleDownloadLogsPDF = () => {
+        const doc = new jsPDF();
+
+        // 1. Header Section - Logo on Left
+        const img = new Image();
+        img.src = '/chanllangers.png';
+        try {
+            doc.addImage(img, 'PNG', 14, 10, 22, 22);
+        } catch (e) {
+            doc.setFillColor(79, 70, 229);
+            doc.rect(14, 10, 22, 22, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(14);
+            doc.text("C", 22, 24);
+        }
+
+        // 2. Title & Subtitle - Aligned next to Logo
+        doc.setTextColor(30, 41, 59);
+        doc.setFontSize(24);
+        doc.setFont('helvetica', 'bold');
+        doc.text("CHALLENGERZ", 42, 20);
+
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(100, 116, 139);
+        doc.text("Audit Logs Report", 42, 26);
+        doc.text(`Generated: ${new Date().toLocaleString()}`, 42, 31);
+
+        const tableColumn = ["Time", "User", "Action", "Target", "Details"];
+        const tableRows = logs.map(log => [
+            new Date(log.timestamp).toLocaleString(),
+            log.performedByName || 'Unknown',
+            log.action,
+            log.target,
+            log.details ? JSON.stringify(log.details) : '-'
+        ]);
+
+        doc.autoTable({
+            startY: 40,
+            head: [tableColumn],
+            body: tableRows,
+            theme: 'striped',
+            headStyles: {
+                fillColor: [79, 70, 229],
+                fontSize: 10,
+                halign: 'center'
+            },
+            styles: {
+                fontSize: 8,
+                cellPadding: 2,
+                overflow: 'linebreak'
+            },
+            columnStyles: {
+                0: { cellWidth: 35 },
+                1: { cellWidth: 25 },
+                2: { cellWidth: 25 },
+                3: { cellWidth: 35 },
+                4: { cellWidth: 'auto' }
+            },
+            alternateRowStyles: {
+                fillColor: [248, 250, 252]
+            }
+        });
+
+        doc.save("CHALLENGERZ_AuditLogs.pdf");
+    };
+
     return (
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
@@ -226,6 +326,9 @@ const SuperAdminDashboard = () => {
                                             }
                                         </td>
                                         <td style={{ display: 'flex', gap: '5px' }}>
+                                            <button onClick={() => handleOpenEditAdmin(admin)} className="btn btn-secondary">
+                                                <FaEdit /> Edit
+                                            </button>
                                             <button onClick={() => openManageEvents(admin)} className="btn btn-secondary">
                                                 <FaExchangeAlt /> Manage
                                             </button>
@@ -327,6 +430,11 @@ const SuperAdminDashboard = () => {
             {/* LOGS TAB */}
             {activeTab === 'logs' && (
                 <div className="card">
+                    <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
+                        <button onClick={handleDownloadLogsPDF} className="btn btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <FaFilePdf /> Download PDF
+                        </button>
+                    </div>
                     <div className="table-container">
                         <table>
                             <thead>
@@ -397,6 +505,49 @@ const SuperAdminDashboard = () => {
                             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
                                 <button type="button" onClick={() => setShowAdminModal(false)} className="btn btn-secondary">Cancel</button>
                                 <button type="submit" className="btn btn-primary">Create</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Edit Admin Modal */}
+            {showEditAdminModal && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <h3>Edit Admin</h3>
+                        <form onSubmit={handleUpdateAdmin}>
+                            <div style={{ marginBottom: '1rem' }}>
+                                <label>Username</label>
+                                <input
+                                    className="input-field"
+                                    value={editAdminForm.username}
+                                    onChange={e => setEditAdminForm({ ...editAdminForm, username: e.target.value })}
+                                    required
+                                />
+                            </div>
+                            <div style={{ marginBottom: '1rem' }}>
+                                <label>Email (Optional)</label>
+                                <input
+                                    className="input-field"
+                                    type="email"
+                                    value={editAdminForm.email}
+                                    onChange={e => setEditAdminForm({ ...editAdminForm, email: e.target.value })}
+                                />
+                            </div>
+                            <div style={{ marginBottom: '1rem' }}>
+                                <label>New Password (Optional)</label>
+                                <input
+                                    className="input-field"
+                                    type="password"
+                                    placeholder="Leave blank to keep unchanged"
+                                    value={editAdminForm.password}
+                                    onChange={e => setEditAdminForm({ ...editAdminForm, password: e.target.value })}
+                                />
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+                                <button type="button" onClick={() => setShowEditAdminModal(false)} className="btn btn-secondary">Cancel</button>
+                                <button type="submit" className="btn btn-primary">Update</button>
                             </div>
                         </form>
                     </div>

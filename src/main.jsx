@@ -6,7 +6,7 @@ import './index.css'
 import axios from 'axios'
 
 axios.defaults.headers.common['Authorization'] = localStorage.getItem('token')
-axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'https://challagerzz-backend.onrender.com'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>

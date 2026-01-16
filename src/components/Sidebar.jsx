@@ -34,7 +34,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             <div className={`sidebar-overlay ${isOpen ? 'open' : ''}`} onClick={onClose}></div>
             <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
                 <div style={{ marginBottom: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-                    <img src="/logo.jpg" alt="Logo" style={{ width: 100, height: 100, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--primary)' }} />
+                    <img src="/chanllangers.png" alt="Logo" style={{ width: 100, height: 100, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--primary)' }} />
                     <h2 style={{ fontSize: '1.25rem', margin: 0, textAlign: 'center', fontWeight: 'bold', color: 'var(--primary)', letterSpacing: '1px' }}>CHALLENGERZ</h2>
                 </div>
 
