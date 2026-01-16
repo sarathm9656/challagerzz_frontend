@@ -6,11 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api': {
-        target: 'https://challagerzz-backend.onrender.com',
-        changeOrigin: true,
-        rewrite: (path) => path
-      }
+      '/api': 'http://localhost:5000'
     }
   }
 })
