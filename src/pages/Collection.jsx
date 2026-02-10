@@ -123,28 +123,28 @@ const Collection = ({ isAdmin }) => {
 
         // 2. Title & Subtitle - Aligned next to Logo
         doc.setTextColor(30, 41, 59);
-        doc.setFontSize(24);
+        doc.setFontSize(28); // Increased from 24
         doc.setFont('helvetica', 'bold');
-        doc.text("CHALLENGERZ", 42, 20);
+        doc.text("CHALLENGERZ", 42, 22); // Adjusted Y
 
-        doc.setFontSize(10);
+        doc.setFontSize(14); // Increased from 10
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(100, 116, 139);
-        doc.text("Cash Collection Report", 42, 26);
-        doc.text(`Generated: ${new Date().toLocaleString()}`, 42, 31);
+        doc.text("Cash Collection Report", 42, 29); // Adjusted Y
+        doc.text(`Generated: ${new Date().toLocaleString()}`, 42, 36); // Adjusted Y
 
         // 3. Stats Summary - Top Right
         const pageWidth = doc.internal.pageSize.getWidth();
         doc.setTextColor(30, 41, 59);
-        doc.setFontSize(10);
+        doc.setFontSize(14); // Increased from 10
         doc.setFont('helvetica', 'bold');
-        doc.text("COLLECTION SUMMARY", pageWidth - 14, 15, { align: 'right' });
+        doc.text("COLLECTION SUMMARY", pageWidth - 14, 20, { align: 'right' }); // Adjusted Y
 
         doc.setFont('helvetica', 'normal');
-        doc.setFontSize(9);
-        doc.text(`Cash Collected:  ${stats.totalCash.toLocaleString()}`, pageWidth - 14, 21, { align: 'right' });
-        doc.text(`Total Due:       ${stats.totalCredit.toLocaleString()}`, pageWidth - 14, 26, { align: 'right' });
-        doc.text(`Total Pending:   ${stats.totalPending.toLocaleString()}`, pageWidth - 14, 31, { align: 'right' });
+        doc.setFontSize(12); // Increased from 9
+        doc.text(`Cash Collected:  ${stats.totalCash.toLocaleString()}`, pageWidth - 14, 27, { align: 'right' }); // Adjusted Y
+        doc.text(`Total Due:       ${stats.totalCredit.toLocaleString()}`, pageWidth - 14, 33, { align: 'right' }); // Adjusted Y
+        doc.text(`Total Pending:   ${stats.totalPending.toLocaleString()}`, pageWidth - 14, 39, { align: 'right' }); // Adjusted Y
 
         const tableColumn = ["#", "Date", "Name", "Amount", "Method", "Status"];
         const tableRows = filteredPeople.map((person, index) => [
@@ -157,22 +157,22 @@ const Collection = ({ isAdmin }) => {
         ]);
 
         doc.autoTable({
-            startY: 40,
+            startY: 50, // Adjusted Y from 40
             head: [tableColumn],
             body: tableRows,
             theme: 'striped',
             headStyles: {
                 fillColor: [79, 70, 229],
-                fontSize: 10,
+                fontSize: 12, // Increased from 10
                 halign: 'center'
             },
             columnStyles: {
-                0: { halign: 'center', cellWidth: 10 },
+                0: { halign: 'center', cellWidth: 15 }, // Increased cell width slightly
                 3: { halign: 'right', fontStyle: 'bold' }
             },
             styles: {
-                fontSize: 9,
-                cellPadding: 4
+                fontSize: 11, // Increased from 9
+                cellPadding: 6 // Increased padding for better readability
             },
             alternateRowStyles: {
                 fillColor: [248, 250, 252]
