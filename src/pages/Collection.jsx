@@ -25,27 +25,21 @@ const Collection = ({ isAdmin }) => {
     const [minAmountFilter, setMinAmountFilter] = useState(0);
 
     const [events, setEvents] = useState([]);
-    const [selectedEventId, setSelectedEventId] = useState('');
+    const [selectedEventId, setSelectedEventId] = useState(() => {
+        const stored = localStorage.getItem('eventId');
+        return (stored && stored !== 'undefined' && stored !== 'null') ? stored : '';
+    });
 
     useEffect(() => {
-        // Initialize from localStorage
-        const storedEventId = localStorage.getItem('eventId');
-        if (storedEventId && storedEventId !== 'undefined' && storedEventId !== 'null') {
-            setSelectedEventId(storedEventId);
-        } else if (isAdmin) {
-            // If admin is logged in but no event stored (e.g. SuperAdmin who skipped selection)
-            // Show nothing or handle as "No Event Selected"
-            setPeople([]); // Default empty
+        // Persist selection to localStorage so it survives refresh
+        if (selectedEventId) {
+            localStorage.setItem('eventId', selectedEventId);
         } else {
-            // Public view: Do we allow fetching all active events' data? 
-            // Requirement: "user not selected the event then dont show"
-            // Assuming this applies to authenticated users primarily, but maybe public too?
-            // If public user visits, they haven't "selected" an event unless we add a dropdown for them.
-            // Let's assume we fetch all for public, but filtered for logged in users.
-            // Actually, "login time to select event... if not selected... don't show"
-            // This strongly suggests handling for the *Logged In User* context.
+            localStorage.removeItem('eventId');
         }
+    }, [selectedEventId]);
 
+    useEffect(() => {
         fetchEvents();
     }, []);
 
