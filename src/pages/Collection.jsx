@@ -163,7 +163,7 @@ const Collection = ({ isAdmin }) => {
             theme: 'striped',
             headStyles: {
                 fillColor: [79, 70, 229],
-                fontSize: 12, // Increased from 10
+                fontSize: 14, // Increased from 10
                 halign: 'center'
             },
             columnStyles: {
@@ -171,7 +171,7 @@ const Collection = ({ isAdmin }) => {
                 3: { halign: 'right', fontStyle: 'bold' }
             },
             styles: {
-                fontSize: 11, // Increased from 9
+                fontSize: 13, // Increased from 9
                 cellPadding: 6 // Increased padding for better readability
             },
             alternateRowStyles: {
